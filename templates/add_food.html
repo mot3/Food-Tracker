@@ -43,22 +43,22 @@
 
             <div class="panel-body">
 
-              <form method="POST" action="/">
+              <form method="POST" action="{{ url_for('food') }}"> 
                 <div class="form-group">
                   <label for="food-name">Food Name</label>
-                  <input type="text" class="form-control" id="food-name" placeholder="Food Name">
+                  <input type="text" class="form-control" name="name" id="food-name" placeholder="Food Name">
                 </div>
                 <div class="form-group">
                   <label for="protein">Protein</label>
-                  <input type="number" class="form-control" id="protein" placeholder="Protein">
+                  <input type="number" class="form-control" name="protein" id="protein" placeholder="Protein">
                 </div>
                 <div class="form-group">
                   <label for="carbohydrates">Carbohydrates</label>
-                  <input type="number" class="form-control" id="carbohydrates" placeholder="Carbohydrates">
+                  <input type="number" class="form-control" name="carbohydrates" id="carbohydrates" placeholder="Carbohydrates">
                 </div>
                 <div class="form-group">
                   <label for="fat">Fat</label>
-                  <input type="number" class="form-control" id="fat" placeholder="Fat">
+                  <input type="number" class="form-control" name="fat" id="fat" placeholder="Fat">
                 </div>
                 <button type="submit" class="btn btn-primary">Add</button>
               </form>

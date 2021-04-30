@@ -4,7 +4,6 @@ from data.database import get_db
 
 app = Flask(__name__)
 
-
 @app.teardown_appcontext
 def close_db(error):
     if hasattr(g, 'sqlite_db'):

@@ -1,20 +1,8 @@
 from flask import Flask, render_template, g, request
-import sqlite3
 from datetime import datetime
+from data.database import get_db
 
 app = Flask(__name__)
-
-
-def connect_db():
-    sql = sqlite3.connect('./data/food_log.db')
-    sql.row_factory = sqlite3.Row
-    return sql
-
-
-def get_db():
-    if not hasattr(g, 'sqlite_db'):
-        g.sqlite_db = connect_db()
-    return g.sqlite_db
 
 
 @app.teardown_appcontext
@@ -42,8 +30,11 @@ def index():
                    [database_date])
         db.commit()
 
-    cur = db.execute(
-        'SELECT entry_date FROM log_date ORDER BY entry_date desc')
+    cur = db.execute("""SELECT log_date.entry_date, sum(protein) as protein, sum(carbohydrates) as carbohydrates, sum(fat) as fat, sum(calories) as calories
+                        FROM log_date
+                        JOIN food_dates ON food_dates.log_date_id = log_date.id
+                        JOIN food ON food.id = food_dates.food_id
+                        GROUP BY log_date.id ORDER BY entry_date DESC""")
     results = cur.fetchall()
 
     date_results = []
@@ -51,6 +42,10 @@ def index():
     for i in results:
         single_date = {}
         single_date['entry_date'] = i['entry_date']
+        single_date['protein'] = i['protein']
+        single_date['carbohydrates'] = i['carbohydrates']
+        single_date['fat'] = i['fat']
+        single_date['calories'] = i['calories']
 
         single_date['pretty_date'] = pretty_date(i['entry_date'])
 
@@ -76,11 +71,11 @@ def view(date):
     cur = db.execute('SELECT id, name FROM food')
     food_results = cur.fetchall()
 
-    cur = db.execute('SELECT name, protein, carbohydrates, fat, calories, entry_date\
-        FROM log_date \
-        JOIN food_dates ON food_dates.log_date_id = log_date.id \
-        JOIN food ON food.id = food_dates.food_id \
-        WHERE entry_date = ?', [date])
+    cur = db.execute("""SELECT name, protein, carbohydrates, fat, calories, entry_date
+                        FROM log_date
+                        JOIN food_dates ON food_dates.log_date_id = log_date.id
+                        JOIN food ON food.id = food_dates.food_id
+                        WHERE entry_date = ?""", [date])
     food_dates_results = cur.fetchall()
 
     totals = {'protein' : 0, 'carbohydrates' : 0, 'fat' : 0, 'calories' : 0}
